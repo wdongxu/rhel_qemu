@@ -128,6 +128,8 @@ struct node_id {
     uint16_t port;
     uint8_t io_addr[16];
     uint16_t io_port;
+    uint8_t ext_io_addr[16];
+    uint16_t ext_io_port;
     uint8_t pad[4];
 };
 
@@ -1572,8 +1574,8 @@ static int sd_get_nodes(BDRVSheepdogState *s, Error **errp)
         for (i = 0; i < nr_nodes; i++) {
             struct sheep_host *p = s->hosts + i;
             p->port = nodes[i].nid.port;
-            if (!inet_ntop(AF_INET, nodes[i].nid.addr + 12,
-                p->addr, INET_ADDRSTRLEN)) {
+            if (!inet_ntop(AF_INET, nodes[i].nid.ext_io_port? nodes[i].nid.ext_io_addr + 12
+					:nodes[i].nid.addr + 12, p->addr, INET_ADDRSTRLEN)) {
                 g_free(s->hosts);
                 ret = SD_RES_SYSTEM_ERROR;
                 goto out;
